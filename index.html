@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Blake2b-JS</title>
+		<!-- First we import Blake2b library -->
+		<script src="Blake2b.js"></script>
+	</head>
+	<body>
+		<h1><a href="https://github.com/Rabbit-Company/Blake2b-JS" target="_blank">Blake2b-JS</a></h1>
+		<textarea id="message" rows="10" cols="50"></textarea></br></br>
+		<input id="secretKey" type="password" placeholder="Secret Key" />
+
+		<p id="hash"></p>
+
+		<h1>Performance Test</h1>
+		<div>
+			<label>Number of executions:</label>
+			<input id="amount" type="number" min="1" max="100000" placeholder="Amount" value="1000" />
+			<button id="btn-start">Start</button>
+		</div>
+		<p id="perf"></p>
+		<!-- Then we can work with it -->
+		<script src="index.js"></script>
+	</body>
+</html>
