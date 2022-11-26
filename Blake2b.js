@@ -1,3 +1,9 @@
+/*
+Blake2b-JS v1.0.0
+https://github.com/Rabbit-Company/Blake2b-JS
+License: GPL-3.0
+*/
+
 class Blake2b {
 
 	v = new Uint32Array(32);
