@@ -1,7 +1,7 @@
 /*
-Blake2b-JS v1.0.0
+Blake2b-JS v1.0.1
 https://github.com/Rabbit-Company/Blake2b-JS
-License: GPL-3.0
+License: MIT
 */
 
 class Blake2b {
