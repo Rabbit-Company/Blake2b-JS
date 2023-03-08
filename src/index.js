@@ -1,3 +1,5 @@
+import Blake2b from "./blake2b.js";
+
 document.getElementById("hash").innerHTML = "<b>Hash:</b> " + Blake2b.hash("", "");
 
 // Hash message

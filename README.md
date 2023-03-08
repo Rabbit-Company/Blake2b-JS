@@ -1,15 +1,20 @@
 # Blake2b-JS
 
-Blake2b-512 implementation in a plain JavaScript.
+Blake2b-512 implementation in JavaScript (ES6).
 
 ## Usage
 
-### 1. Import library
-```html
-<script src="Blake2b.min.js"></script>
+### 1. Download library
+```bash
+npm i --save @rabbit-company/blake2b
 ```
 
-### 2. Hash
+### 2. Import library
+```js
+import Blake2b from "@rabbit-company/blake2b";
+```
+
+### 3. Hash
 ```js
 /*
 

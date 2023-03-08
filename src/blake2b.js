@@ -1,10 +1,4 @@
-/*
-Blake2b-JS v1.0.1
-https://github.com/Rabbit-Company/Blake2b-JS
-License: MIT
-*/
-
-class Blake2b {
+export default class Blake2b {
 
 	v = new Uint32Array(32);
 	m = new Uint32Array(32);
@@ -35,7 +29,7 @@ class Blake2b {
 		})
 	);
 
-	ADD64AA (v, a, b) {
+	ADD64AA(v, a, b){
 		const o0 = v[a] + v[b];
 		let o1 = v[a+1] + v[b+1];
 		if (o0 >= 0x100000000) o1++;
@@ -43,7 +37,7 @@ class Blake2b {
 		v[a+1] = o1;
 	}
 
-	ADD64AC (v, a, b0, b1) {
+	ADD64AC(v, a, b0, b1){
 		let o0 = v[a] + b0;
 		if (b0 < 0) o0 += 0x100000000;
 		let o1 = v[a+1] + b1
@@ -52,11 +46,11 @@ class Blake2b {
 		v[a+1] = o1;
 	}
 
-	B2B_GET32 (arr, i) {
+	B2B_GET32(arr, i){
 		return arr[i] ^ (arr[i+1] << 8) ^ (arr[i+2] << 16) ^ (arr[i+3] << 24);
 	}
 
-	B2B_G (a, b, c, d, ix, iy) {
+	B2B_G(a, b, c, d, ix, iy){
 		const x0 = this.m[ix];
 		const x1 = this.m[ix+1];
 		const y0 = this.m[iy];
@@ -93,10 +87,10 @@ class Blake2b {
 		this.v[b+1] = (xor0 >>> 31) ^ (xor1 << 1);
 	}
 
-	blake2bCompress (ctx, last) {
+	blake2bCompress(ctx, last){
 		let i = 0;
 
-		for (i = 0; i < 16; i++) {
+		for(i = 0; i < 16; i++){
 			this.v[i] = ctx.h[i];
 			this.v[i+16] = this.BLAKE2B_IV32[i];
 		}
@@ -104,16 +98,16 @@ class Blake2b {
 		this.v[24] = this.v[24] ^ ctx.t;
 		this.v[25] = this.v[25] ^ (ctx.t / 0x100000000);
 
-		if (last) {
+		if(last){
 			this.v[28] = ~this.v[28];
 			this.v[29] = ~this.v[29];
 		}
 
-		for (i = 0; i < 32; i++) {
+		for(i = 0; i < 32; i++){
 			this.m[i] = this.B2B_GET32(ctx.b, 4*i);
 		}
 
-		for (i = 0; i < 12; i++) {
+		for(i = 0; i < 12; i++){
 			this.B2B_G(0, 8, 16, 24, this.SIGMA82[i * 16 + 0], this.SIGMA82[i * 16 + 1])
 			this.B2B_G(2, 10, 18, 26, this.SIGMA82[i * 16 + 2], this.SIGMA82[i * 16 + 3])
 			this.B2B_G(4, 12, 20, 28, this.SIGMA82[i * 16 + 4], this.SIGMA82[i * 16 + 5])
@@ -124,22 +118,22 @@ class Blake2b {
 			this.B2B_G(6, 8, 18, 28, this.SIGMA82[i * 16 + 14], this.SIGMA82[i * 16 + 15])
 		}
 
-		for (i = 0; i < 16; i++) {
+		for(i = 0; i < 16; i++){
 			ctx.h[i] = ctx.h[i] ^ this.v[i] ^ this.v[i+16];
 		}
 	}
 
-	blake2bInit (outlen, key, salt, personal) {
-		if (outlen === 0 || outlen > 64) {
+	blake2bInit(outlen, key, salt, personal){
+		if(outlen === 0 || outlen > 64){
 			throw new Error('Illegal output length, expected 0 < length <= 64');
 		}
-		if (key && key.length > 64) {
+		if(key && key.length > 64){
 			throw new Error('Illegal key, expected Uint8Array with 0 < length <= 64');
 		}
-		if (salt && salt.length !== 16) {
+		if(salt && salt.length !== 16){
 			throw new Error('Illegal salt, expected Uint8Array with length is 16');
 		}
-		if (personal && personal.length !== 16) {
+		if(personal && personal.length !== 16){
 			throw new Error('Illegal personal, expected Uint8Array with length is 16');
 		}
 
@@ -153,17 +147,17 @@ class Blake2b {
 
 		this.parameterBlock.fill(0);
 		this.parameterBlock[0] = outlen;
-		if (key) this.parameterBlock[1] = key.length;
+		if(key) this.parameterBlock[1] = key.length;
 		this.parameterBlock[2] = 1;
 		this.parameterBlock[3] = 1;
-		if (salt) this.parameterBlock.set(salt, 32);
-		if (personal) this.parameterBlock.set(personal, 48);
+		if(salt) this.parameterBlock.set(salt, 32);
+		if(personal) this.parameterBlock.set(personal, 48);
 
-		for (let i = 0; i < 16; i++) {
+		for(let i = 0; i < 16; i++){
 			ctx.h[i] = this.BLAKE2B_IV32[i] ^ this.B2B_GET32(this.parameterBlock, i * 4);
 		}
 
-		if (key) {
+		if(key){
 			this.blake2bUpdate(ctx, key);
 			ctx.c = 128;
 		}
@@ -171,7 +165,7 @@ class Blake2b {
 		return ctx
 	}
 
-	blake2bUpdate (ctx, input) {
+	blake2bUpdate(ctx, input){
 		for (let i = 0; i < input.length; i++) {
 			if (ctx.c === 128) {
 				ctx.t += ctx.c;
@@ -182,7 +176,7 @@ class Blake2b {
 		}
 	}
 
-	blake2bFinal (ctx) {
+	blake2bFinal(ctx){
 		ctx.t += ctx.c;
 
 		while (ctx.c < 128) {
@@ -197,40 +191,35 @@ class Blake2b {
 		return out;
 	}
 
-	blake2bStart (input, key, outlen, salt, personal) {
+	blake2bStart(input, key, outlen, salt, personal){
 		outlen = outlen || 64;
 		input = this.normalizeInput(input);
-		if (salt) {
-			salt = this.normalizeInput(salt);
-		}
-		if (personal) {
-			personal = this.normalizeInput(personal);
-		}
-
+		if(salt) salt = this.normalizeInput(salt);
+		if(personal) personal = this.normalizeInput(personal);
 		const ctx = this.blake2bInit(outlen, key, salt, personal);
 		this.blake2bUpdate(ctx, input);
 		return this.blake2bFinal(ctx);
 	}
 
-	blake2bHex (input, key, outlen, salt, personal) {
+	blake2bHex(input, key, outlen, salt, personal){
 		const output = blake2bStart(input, key, outlen, salt, personal);
 		return toHex(output);
 	}
 
-	normalizeInput (input) {
+	normalizeInput(input){
 		let ret;
-		if (input instanceof Uint8Array) {
+		if(input instanceof Uint8Array){
 			ret = input;
-		} else if (typeof input === 'string') {
+		}else if(typeof input === 'string'){
 			const encoder = new TextEncoder();
 			ret = encoder.encode(input);
-		} else {
+		}else{
 			throw new Error('Input must be an string, Buffer or Uint8Array');
 		}
 		return ret;
 	}
 
-	toHex (bytes) {
+	toHex(bytes){
 		return Array.prototype.map.call(bytes, function (n) {
 			return (n < 16 ? '0' : '') + n.toString(16);
 		}).join('');
