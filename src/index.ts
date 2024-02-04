@@ -1,37 +1,44 @@
 import Blake2b from "./blake2b.js";
 
-document.getElementById("hash").innerHTML = "<b>Hash:</b> " + Blake2b.hash("", "");
+const hashElement = document.getElementById("hash");
+const messageInput = document.getElementById("message") as HTMLInputElement;
+const secretInput = document.getElementById("secretKey") as HTMLInputElement;
+const amountInput = document.getElementById("amount") as HTMLInputElement;
+
+if(hashElement) hashElement.innerHTML = "<b>Hash:</b> " + Blake2b.hash('', '');
 
 // Hash message
 function calculateHash(){
-  let textPlan = document.getElementById("message").value;
-	let secretKey = document.getElementById("secretKey").value;
+  let textPlan = messageInput?.value;
+	let secretKey = secretInput?.value;
 
-	document.getElementById("hash").innerHTML = "<b>Hash:</b> " + Blake2b.hash(textPlan, secretKey);
+	if(hashElement) hashElement.innerHTML = "<b>Hash:</b> " + Blake2b.hash(textPlan, secretKey);
 }
 
-document.getElementById("message").addEventListener('input', () => {
+messageInput.addEventListener('input', () => {
   calculateHash();
 });
 
-document.getElementById("secretKey").addEventListener('input', () => {
+secretInput.addEventListener('input', () => {
   calculateHash();
 });
 
-function getRandomInt(max) {
+function getRandomInt(max: number) {
   return Math.floor(Math.random() * max);
 }
 
-function calcT(timer){
+function calcT(timer: number){
 	return Date.now() - timer;
 }
 
 // Performance test
-document.getElementById("btn-start").addEventListener("click", () => {
-	let amount = document.getElementById("amount").value;
+document.getElementById("btn-start")?.addEventListener("click", () => {
+	const perf = document.getElementById("perf");
+	if(!perf) return;
+
+	let amount = parseInt(amountInput?.value, 10);
 	if(amount < 1) amount = 1;
 	if(amount > 100000) amount = 100000;
-	let perf = document.getElementById("perf");
 	let messages = [];
 	let hashedMessages = [];
 	let secretKey = "test123";
@@ -41,7 +48,7 @@ document.getElementById("btn-start").addEventListener("click", () => {
 
 	let timer = Date.now();
 	for(let i = 0; i < amount; i++){
-		messages[i] = btoa(getRandomInt(100000) + Date.now() + getRandomInt(100000));
+		messages[i] = btoa('' + getRandomInt(100000) + Date.now() + getRandomInt(100000));
 	}
 	perf.innerText += "2. " + amount + " random messages generated in " + calcT(timer) + " milliseconds.\n";
 

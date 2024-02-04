@@ -1,3 +1,11 @@
+interface CTX {
+	b: Uint8Array;
+	h: Uint32Array;
+	t: number;
+	c: number;
+	outlen: number;
+}
+
 export default class Blake2b {
 
 	v = new Uint32Array(32);
@@ -29,7 +37,7 @@ export default class Blake2b {
 		})
 	);
 
-	ADD64AA(v, a, b){
+	ADD64AA(v: Uint32Array, a: number, b: number): void{
 		const o0 = v[a] + v[b];
 		let o1 = v[a+1] + v[b+1];
 		if (o0 >= 0x100000000) o1++;
@@ -37,7 +45,7 @@ export default class Blake2b {
 		v[a+1] = o1;
 	}
 
-	ADD64AC(v, a, b0, b1){
+	ADD64AC(v: Uint32Array, a: number, b0: number, b1: number): void{
 		let o0 = v[a] + b0;
 		if (b0 < 0) o0 += 0x100000000;
 		let o1 = v[a+1] + b1
@@ -46,11 +54,11 @@ export default class Blake2b {
 		v[a+1] = o1;
 	}
 
-	B2B_GET32(arr, i){
+	B2B_GET32(arr: Uint8Array, i: number): number{
 		return arr[i] ^ (arr[i+1] << 8) ^ (arr[i+2] << 16) ^ (arr[i+3] << 24);
 	}
 
-	B2B_G(a, b, c, d, ix, iy){
+	B2B_G(a: number, b: number, c: number, d: number, ix: number, iy: number): void{
 		const x0 = this.m[ix];
 		const x1 = this.m[ix+1];
 		const y0 = this.m[iy];
@@ -87,7 +95,7 @@ export default class Blake2b {
 		this.v[b+1] = (xor0 >>> 31) ^ (xor1 << 1);
 	}
 
-	blake2bCompress(ctx, last){
+	blake2bCompress(ctx: CTX, last: boolean): void{
 		let i = 0;
 
 		for(i = 0; i < 16; i++){
@@ -123,7 +131,7 @@ export default class Blake2b {
 		}
 	}
 
-	blake2bInit(outlen, key, salt, personal){
+	blake2bInit(outlen: number, key: Uint8Array | undefined, salt: Uint8Array, personal: Uint8Array): CTX{
 		if(outlen === 0 || outlen > 64){
 			throw new Error('Illegal output length, expected 0 < length <= 64');
 		}
@@ -137,7 +145,7 @@ export default class Blake2b {
 			throw new Error('Illegal personal, expected Uint8Array with length is 16');
 		}
 
-		const ctx = {
+		const ctx: CTX = {
 			b: new Uint8Array(128),
 			h: new Uint32Array(16),
 			t: 0,
@@ -165,7 +173,7 @@ export default class Blake2b {
 		return ctx
 	}
 
-	blake2bUpdate(ctx, input){
+	blake2bUpdate(ctx: CTX, input: Uint8Array): void{
 		for (let i = 0; i < input.length; i++) {
 			if (ctx.c === 128) {
 				ctx.t += ctx.c;
@@ -176,7 +184,7 @@ export default class Blake2b {
 		}
 	}
 
-	blake2bFinal(ctx){
+	blake2bFinal(ctx: CTX): Uint8Array{
 		ctx.t += ctx.c;
 
 		while (ctx.c < 128) {
@@ -191,22 +199,14 @@ export default class Blake2b {
 		return out;
 	}
 
-	blake2bStart(input, key, outlen, salt, personal){
+	blake2bStart(input: string | Uint8Array, key: Uint8Array | undefined, outlen: number, salt: string | Uint8Array, personal: string | Uint8Array): Uint8Array{
 		outlen = outlen || 64;
-		input = this.normalizeInput(input);
-		if(salt) salt = this.normalizeInput(salt);
-		if(personal) personal = this.normalizeInput(personal);
-		const ctx = this.blake2bInit(outlen, key, salt, personal);
-		this.blake2bUpdate(ctx, input);
+		const ctx = this.blake2bInit(outlen, key, this.normalizeInput(salt), this.normalizeInput(personal));
+		this.blake2bUpdate(ctx, this.normalizeInput(input));
 		return this.blake2bFinal(ctx);
 	}
 
-	blake2bHex(input, key, outlen, salt, personal){
-		const output = blake2bStart(input, key, outlen, salt, personal);
-		return toHex(output);
-	}
-
-	normalizeInput(input){
+	normalizeInput(input: string | Uint8Array): Uint8Array{
 		let ret;
 		if(input instanceof Uint8Array){
 			ret = input;
@@ -219,13 +219,26 @@ export default class Blake2b {
 		return ret;
 	}
 
-	toHex(bytes){
+	toHex(bytes: Uint8Array): string{
 		return Array.prototype.map.call(bytes, function (n) {
 			return (n < 16 ? '0' : '') + n.toString(16);
 		}).join('');
 	}
 
-	static hash(message, secret, length = 64, salt, personal){
+	/**
+	 * Calculates the Blake2b hash of the given message using the specified parameters.
+	 *
+	 * @param {string | Uint8Array} message - The input message to be hashed.
+	 * @param {string | Uint8Array | undefined} secret - The secret key for HMAC mode (optional).
+	 * @param {number} [length=64] - The desired length of the hash output in bytes (default is 64).
+	 * @param {string | Uint8Array} [salt=new Uint8Array(16)] - The salt value for the hash function (default is a new Uint8Array(16)).
+	 * @param {string | Uint8Array} [personal=new Uint8Array(16)] - The personalization string for the hash function (default is a new Uint8Array(16)).
+	 * @returns {string} - The hexadecimal representation of the Blake2b hash output.
+	*/
+	static hash(message: string | Uint8Array = '', secret: string | Uint8Array | undefined, length: number = 64, salt: string | Uint8Array = new Uint8Array(16), personal: string | Uint8Array = new Uint8Array(16)): string{
+		if(secret?.length === 0) secret = undefined;
+		if(typeof(secret) === 'string') secret = new TextEncoder().encode(secret);
+
 		let b1 = new Blake2b();
 		const output = b1.blake2bStart(message, secret, length, salt, personal);
 		return b1.toHex(output);
