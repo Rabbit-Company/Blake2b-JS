@@ -19,8 +19,8 @@ import Blake2b from "@rabbit-company/blake2b";
 /*
 
   Parameters:
-  1. Message (String)
-  2. Secret (String) <>
+  1. Message (String or Uint8Array)
+  2. Secret (String or Uint8Array | undefined) <>
   3. Length (Int) <64> (Min = 0 and Max = 64)
   4. Salt (String or Uint8Array) <> (String with length 16 or Uint8Array)
   5. Personal (String or Uint8Array) <> (String with length 16 or Uint8Array)
