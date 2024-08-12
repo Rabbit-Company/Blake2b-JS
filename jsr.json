@@ -1,0 +1,5 @@
+{
+	"name": "@rabbit-company/blake2b",
+	"version": "2.1.0",
+	"exports": "./src/blake2b.ts"
+}

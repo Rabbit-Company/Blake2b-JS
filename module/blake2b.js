@@ -1,8 +1,9 @@
 // src/blake2b.ts
-class Blake2b {
-  v = new Uint32Array(32);
-  m = new Uint32Array(32);
-  BLAKE2B_IV32 = new Uint32Array([
+var Blake2b;
+((Blake2b) => {
+  const v = new Uint32Array(32);
+  const m = new Uint32Array(32);
+  const BLAKE2B_IV32 = new Uint32Array([
     4089235720,
     1779033703,
     2227873595,
@@ -20,7 +21,7 @@ class Blake2b {
     327033209,
     1541459225
   ]);
-  SIGMA8 = [
+  const SIGMA8 = [
     0,
     1,
     2,
@@ -214,89 +215,89 @@ class Blake2b {
     5,
     3
   ];
-  parameterBlock = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  SIGMA82 = new Uint8Array(this.SIGMA8.map(function(x) {
+  const parameterBlock = new Uint8Array(64).fill(0);
+  const SIGMA82 = new Uint8Array(SIGMA8.map(function(x) {
     return x * 2;
   }));
-  ADD64AA(v, a, b) {
-    const o0 = v[a] + v[b];
-    let o1 = v[a + 1] + v[b + 1];
+  function ADD64AA(v2, a, b) {
+    const o0 = v2[a] + v2[b];
+    let o1 = v2[a + 1] + v2[b + 1];
     if (o0 >= 4294967296)
       o1++;
-    v[a] = o0;
-    v[a + 1] = o1;
+    v2[a] = o0;
+    v2[a + 1] = o1;
   }
-  ADD64AC(v, a, b0, b1) {
-    let o0 = v[a] + b0;
+  function ADD64AC(v2, a, b0, b1) {
+    let o0 = v2[a] + b0;
     if (b0 < 0)
       o0 += 4294967296;
-    let o1 = v[a + 1] + b1;
+    let o1 = v2[a + 1] + b1;
     if (o0 >= 4294967296)
       o1++;
-    v[a] = o0;
-    v[a + 1] = o1;
+    v2[a] = o0;
+    v2[a + 1] = o1;
   }
-  B2B_GET32(arr, i) {
+  function B2B_GET32(arr, i) {
     return arr[i] ^ arr[i + 1] << 8 ^ arr[i + 2] << 16 ^ arr[i + 3] << 24;
   }
-  B2B_G(a, b, c, d, ix, iy) {
-    const x0 = this.m[ix];
-    const x1 = this.m[ix + 1];
-    const y0 = this.m[iy];
-    const y1 = this.m[iy + 1];
-    this.ADD64AA(this.v, a, b);
-    this.ADD64AC(this.v, a, x0, x1);
-    let xor0 = this.v[d] ^ this.v[a];
-    let xor1 = this.v[d + 1] ^ this.v[a + 1];
-    this.v[d] = xor1;
-    this.v[d + 1] = xor0;
-    this.ADD64AA(this.v, c, d);
-    xor0 = this.v[b] ^ this.v[c];
-    xor1 = this.v[b + 1] ^ this.v[c + 1];
-    this.v[b] = xor0 >>> 24 ^ xor1 << 8;
-    this.v[b + 1] = xor1 >>> 24 ^ xor0 << 8;
-    this.ADD64AA(this.v, a, b);
-    this.ADD64AC(this.v, a, y0, y1);
-    xor0 = this.v[d] ^ this.v[a];
-    xor1 = this.v[d + 1] ^ this.v[a + 1];
-    this.v[d] = xor0 >>> 16 ^ xor1 << 16;
-    this.v[d + 1] = xor1 >>> 16 ^ xor0 << 16;
-    this.ADD64AA(this.v, c, d);
-    xor0 = this.v[b] ^ this.v[c];
-    xor1 = this.v[b + 1] ^ this.v[c + 1];
-    this.v[b] = xor1 >>> 31 ^ xor0 << 1;
-    this.v[b + 1] = xor0 >>> 31 ^ xor1 << 1;
+  function B2B_G(a, b, c, d, ix, iy) {
+    const x0 = m[ix];
+    const x1 = m[ix + 1];
+    const y0 = m[iy];
+    const y1 = m[iy + 1];
+    ADD64AA(v, a, b);
+    ADD64AC(v, a, x0, x1);
+    let xor0 = v[d] ^ v[a];
+    let xor1 = v[d + 1] ^ v[a + 1];
+    v[d] = xor1;
+    v[d + 1] = xor0;
+    ADD64AA(v, c, d);
+    xor0 = v[b] ^ v[c];
+    xor1 = v[b + 1] ^ v[c + 1];
+    v[b] = xor0 >>> 24 ^ xor1 << 8;
+    v[b + 1] = xor1 >>> 24 ^ xor0 << 8;
+    ADD64AA(v, a, b);
+    ADD64AC(v, a, y0, y1);
+    xor0 = v[d] ^ v[a];
+    xor1 = v[d + 1] ^ v[a + 1];
+    v[d] = xor0 >>> 16 ^ xor1 << 16;
+    v[d + 1] = xor1 >>> 16 ^ xor0 << 16;
+    ADD64AA(v, c, d);
+    xor0 = v[b] ^ v[c];
+    xor1 = v[b + 1] ^ v[c + 1];
+    v[b] = xor1 >>> 31 ^ xor0 << 1;
+    v[b + 1] = xor0 >>> 31 ^ xor1 << 1;
   }
-  blake2bCompress(ctx, last) {
+  function blake2bCompress(ctx, last) {
     let i = 0;
     for (i = 0;i < 16; i++) {
-      this.v[i] = ctx.h[i];
-      this.v[i + 16] = this.BLAKE2B_IV32[i];
+      v[i] = ctx.h[i];
+      v[i + 16] = BLAKE2B_IV32[i];
     }
-    this.v[24] = this.v[24] ^ ctx.t;
-    this.v[25] = this.v[25] ^ ctx.t / 4294967296;
+    v[24] = v[24] ^ ctx.t;
+    v[25] = v[25] ^ ctx.t / 4294967296;
     if (last) {
-      this.v[28] = ~this.v[28];
-      this.v[29] = ~this.v[29];
+      v[28] = ~v[28];
+      v[29] = ~v[29];
     }
     for (i = 0;i < 32; i++) {
-      this.m[i] = this.B2B_GET32(ctx.b, 4 * i);
+      m[i] = B2B_GET32(ctx.b, 4 * i);
     }
     for (i = 0;i < 12; i++) {
-      this.B2B_G(0, 8, 16, 24, this.SIGMA82[i * 16 + 0], this.SIGMA82[i * 16 + 1]);
-      this.B2B_G(2, 10, 18, 26, this.SIGMA82[i * 16 + 2], this.SIGMA82[i * 16 + 3]);
-      this.B2B_G(4, 12, 20, 28, this.SIGMA82[i * 16 + 4], this.SIGMA82[i * 16 + 5]);
-      this.B2B_G(6, 14, 22, 30, this.SIGMA82[i * 16 + 6], this.SIGMA82[i * 16 + 7]);
-      this.B2B_G(0, 10, 20, 30, this.SIGMA82[i * 16 + 8], this.SIGMA82[i * 16 + 9]);
-      this.B2B_G(2, 12, 22, 24, this.SIGMA82[i * 16 + 10], this.SIGMA82[i * 16 + 11]);
-      this.B2B_G(4, 14, 16, 26, this.SIGMA82[i * 16 + 12], this.SIGMA82[i * 16 + 13]);
-      this.B2B_G(6, 8, 18, 28, this.SIGMA82[i * 16 + 14], this.SIGMA82[i * 16 + 15]);
+      B2B_G(0, 8, 16, 24, SIGMA82[i * 16 + 0], SIGMA82[i * 16 + 1]);
+      B2B_G(2, 10, 18, 26, SIGMA82[i * 16 + 2], SIGMA82[i * 16 + 3]);
+      B2B_G(4, 12, 20, 28, SIGMA82[i * 16 + 4], SIGMA82[i * 16 + 5]);
+      B2B_G(6, 14, 22, 30, SIGMA82[i * 16 + 6], SIGMA82[i * 16 + 7]);
+      B2B_G(0, 10, 20, 30, SIGMA82[i * 16 + 8], SIGMA82[i * 16 + 9]);
+      B2B_G(2, 12, 22, 24, SIGMA82[i * 16 + 10], SIGMA82[i * 16 + 11]);
+      B2B_G(4, 14, 16, 26, SIGMA82[i * 16 + 12], SIGMA82[i * 16 + 13]);
+      B2B_G(6, 8, 18, 28, SIGMA82[i * 16 + 14], SIGMA82[i * 16 + 15]);
     }
     for (i = 0;i < 16; i++) {
-      ctx.h[i] = ctx.h[i] ^ this.v[i] ^ this.v[i + 16];
+      ctx.h[i] = ctx.h[i] ^ v[i] ^ v[i + 16];
     }
   }
-  blake2bInit(outlen, key, salt, personal) {
+  function blake2bInit(outlen, key, salt, personal) {
     if (outlen === 0 || outlen > 64) {
       throw new Error("Illegal output length, expected 0 < length <= 64");
     }
@@ -316,54 +317,54 @@ class Blake2b {
       c: 0,
       outlen
     };
-    this.parameterBlock.fill(0);
-    this.parameterBlock[0] = outlen;
+    parameterBlock.fill(0);
+    parameterBlock[0] = outlen;
     if (key)
-      this.parameterBlock[1] = key.length;
-    this.parameterBlock[2] = 1;
-    this.parameterBlock[3] = 1;
+      parameterBlock[1] = key.length;
+    parameterBlock[2] = 1;
+    parameterBlock[3] = 1;
     if (salt)
-      this.parameterBlock.set(salt, 32);
+      parameterBlock.set(salt, 32);
     if (personal)
-      this.parameterBlock.set(personal, 48);
+      parameterBlock.set(personal, 48);
     for (let i = 0;i < 16; i++) {
-      ctx.h[i] = this.BLAKE2B_IV32[i] ^ this.B2B_GET32(this.parameterBlock, i * 4);
+      ctx.h[i] = BLAKE2B_IV32[i] ^ B2B_GET32(parameterBlock, i * 4);
     }
     if (key) {
-      this.blake2bUpdate(ctx, key);
+      blake2bUpdate(ctx, key);
       ctx.c = 128;
     }
     return ctx;
   }
-  blake2bUpdate(ctx, input) {
+  function blake2bUpdate(ctx, input) {
     for (let i = 0;i < input.length; i++) {
       if (ctx.c === 128) {
         ctx.t += ctx.c;
-        this.blake2bCompress(ctx, false);
+        blake2bCompress(ctx, false);
         ctx.c = 0;
       }
       ctx.b[ctx.c++] = input[i];
     }
   }
-  blake2bFinal(ctx) {
+  function blake2bFinal(ctx) {
     ctx.t += ctx.c;
     while (ctx.c < 128) {
       ctx.b[ctx.c++] = 0;
     }
-    this.blake2bCompress(ctx, true);
+    blake2bCompress(ctx, true);
     const out = new Uint8Array(ctx.outlen);
     for (let i = 0;i < ctx.outlen; i++) {
       out[i] = ctx.h[i >> 2] >> 8 * (i & 3);
     }
     return out;
   }
-  blake2bStart(input, key, outlen, salt, personal) {
+  function blake2bStart(input, key, outlen, salt, personal) {
     outlen = outlen || 64;
-    const ctx = this.blake2bInit(outlen, key, this.normalizeInput(salt), this.normalizeInput(personal));
-    this.blake2bUpdate(ctx, this.normalizeInput(input));
-    return this.blake2bFinal(ctx);
+    const ctx = blake2bInit(outlen, key, normalizeInput(salt), normalizeInput(personal));
+    blake2bUpdate(ctx, normalizeInput(input));
+    return blake2bFinal(ctx);
   }
-  normalizeInput(input) {
+  function normalizeInput(input) {
     let ret;
     if (input instanceof Uint8Array) {
       ret = input;
@@ -375,21 +376,22 @@ class Blake2b {
     }
     return ret;
   }
-  toHex(bytes) {
+  function toHex(bytes) {
     return Array.prototype.map.call(bytes, function(n) {
       return (n < 16 ? "0" : "") + n.toString(16);
     }).join("");
   }
-  static hash(message = "", secret, length = 64, salt = new Uint8Array(16), personal = new Uint8Array(16)) {
+  function hash(message = "", secret = undefined, length = 64, salt = new Uint8Array(16), personal = new Uint8Array(16)) {
     if (secret?.length === 0)
       secret = undefined;
     if (typeof secret === "string")
       secret = new TextEncoder().encode(secret);
-    let b1 = new Blake2b;
-    const output = b1.blake2bStart(message, secret, length, salt, personal);
-    return b1.toHex(output);
+    const output = blake2bStart(message, secret, length, salt, personal);
+    return toHex(output);
   }
-}
+  Blake2b.hash = hash;
+})(Blake2b ||= {});
+var blake2b_default = Blake2b;
 export {
-  Blake2b as default
+  blake2b_default as default
 };

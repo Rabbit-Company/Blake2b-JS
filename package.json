@@ -1,6 +1,6 @@
 {
 	"name": "@rabbit-company/blake2b",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"description": "Blake2b-512 hash function",
 	"main": "./module/blake2b.js",
 	"browser": "./module/blake2b.js",
@@ -37,8 +37,8 @@
 	],
 	"devDependencies": {
 		"@types/bun": "latest",
-		"bun-plugin-dts": "^0.2.1",
-		"@rabbit-company/logger": "^3.1.0"
+		"bun-plugin-dts": "^0.2.3",
+		"@rabbit-company/logger": "^4.0.0"
 	},
 	"peerDependencies": {
 		"typescript": "^5.0.0"
