@@ -1,5 +1,8 @@
 {
 	"name": "@rabbit-company/blake2b",
-	"version": "2.1.0",
-	"exports": "./src/blake2b.ts"
+	"version": "2.1.1",
+	"exports": "./src/blake2b.ts",
+	"publish": {
+		"include": ["LICENSE", "README.md", "src/blake2b.ts"]
+	}
 }
